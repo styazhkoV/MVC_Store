@@ -100,6 +100,117 @@ namespace MVC_Store.Areas.Admin.Controllers
             return RedirectToAction("Index");
 
         }
+        // GET: Admin/Pages/EditPags/id
+        [HttpGet]
+        public ActionResult EditPage(int id)
+        {
+            //Объявление модели PageVM
+            PageVM model;
+            using (Db db = new Db())
+            {
 
+                //Получение ID страницы
+                PagesDTO dto = db.Pages.Find(id);
+
+                //Проверяем доступность страницы
+                if (dto == null)
+                {
+                    return Content("Страница не доступна");
+                }
+
+                //Инициализация модели из DTO 
+                model = new PageVM(dto);
+            }
+            //Возвращаем модель и представление
+            return View(model);
+        }
+        // POST: Admin/Pages/EditPags/id
+        [HttpPost]
+        public ActionResult EditPage(PageVM model)
+        {
+            //Проверить модель на валидность
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            using (Db db = new Db())
+            {
+
+                // Получить ID страницы
+
+                int id = model.Id;
+                //Объявление переменной для Slug 
+                string slug = "home";
+
+                //Получение страницы по ID
+                PagesDTO dto = db.Pages.Find(id);
+
+                //Присвоить название полученной из модели в DTO 
+                dto.Title = model.Title;
+
+                // Проверить краткий загаловок и присвоить его, если необходимо
+                if (model.Slug != "home")
+                {
+                    if (string.IsNullOrWhiteSpace(model.Slug))
+                    {
+                        slug = model.Title.Replace(" ", "-").ToLower();
+                    }
+                    else
+                    {
+                        slug = model.Slug.Replace(" ", "-").ToLower();
+                    }
+                }
+
+                //Проверить краткий заголовок и Title на уникальность
+                if(db.Pages.Where(x=> x.Id != id).Any(x=> x.Title == model.Title))
+                {
+                    ModelState.AddModelError(" ", " Этот заголовок не доступен");
+                    return View(model);
+                }
+                else if (db.Pages.Where(x => x.Id != id).Any(x => x.Slug == slug))
+                {
+                    ModelState.AddModelError(" ", " Это описание не доступно");
+                    return View(model);
+                }
+
+                //Присвоить остальные значения в класс DTO
+                dto.Slug = slug;
+                dto.Body = model.Body;
+                dto.HasSidebar = model.HasSidebar;
+                //Сохранить в БД
+                db.SaveChanges();
+            }
+
+
+            //Установить сообщение  TempData
+            TempData["SM"] = "Вы отредактировали эту стрницу";
+
+            //Переадресация пользователя
+            return RedirectToAction("EditPage");
+        }
+
+        // GET: Admin/Pages/PageDetails/id 
+        public ActionResult PageDetails(int id)
+        {
+            // Объявить модель PageVM
+            PageVM model;
+            using (Db db = new Db())
+            {
+                //Получение Id страницы
+                PagesDTO dto = db.Pages.Find(id);
+
+                //Подтверждаем, что старница доступна
+                if (dto == null)
+                {
+                    return Content("Эта страница не доступна");
+                }
+                // Присваеваем модели ниформацию из БД
+                model = new PageVM(dto);
+            }
+
+            //Возвращаем модель в представление
+            return View(model);
+        }
     }
+
 }

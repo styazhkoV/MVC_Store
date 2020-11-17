@@ -29,6 +29,7 @@ namespace MVC_Store.Models.ViewModels.Pages
         public string Slug { get; set; }
         public string Body { get; set; }
         public string Sorting { get; set; }
+        [Display(Name = "Sidebar")]
         public bool HasSidebar { get; set; }
     }
 }
