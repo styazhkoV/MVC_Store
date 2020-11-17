@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace MVC_Store.Models.Data
 {
     [Table("tblPages")]
-    public class PagesDTO 
+    public class PagesDTO
     {
         [Key]
         public int Id { get; set; }
@@ -17,7 +13,6 @@ namespace MVC_Store.Models.Data
         public string Body { get; set; }
         public string Sorting { get; set; }
         public bool HasSidebar { get; set; }
-
 
     }
 }
